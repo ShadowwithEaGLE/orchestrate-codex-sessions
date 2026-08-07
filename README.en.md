@@ -121,4 +121,4 @@ Both Skill directories are checked with the official Codex `skill-creator` valid
 
 ## License
 
-No open-source license has been selected yet.
+This project is licensed under the [GNU General Public License v3.0 only](LICENSE), SPDX identifier `GPL-3.0-only`.

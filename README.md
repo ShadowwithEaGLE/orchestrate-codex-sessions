@@ -121,4 +121,4 @@ skills/
 
 ## License
 
-尚未选择开源许可证。
+本项目采用 [GNU General Public License v3.0 only](LICENSE)，SPDX 标识为 `GPL-3.0-only`。
