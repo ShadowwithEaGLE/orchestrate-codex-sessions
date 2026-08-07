@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex 多 Session 总管"
+  short_description: "按第一性原理编排主任务、subagent、可见任务与质量闸门"
+  default_prompt: "Use $orchestrate-codex-sessions 按第一性原理选择最小充分工作单元，并用明确所有权、质量闸门和证据完成当前任务。"
