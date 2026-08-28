@@ -2,6 +2,20 @@
 
 Read and copy only the template required for the current task. Remove irrelevant placeholders. Do not introduce an abstraction for a single use.
 
+## Pre-dispatch routing declaration
+
+```text
+Work unit: ...
+Level: Level 0 / Level 1 / Level 2
+Sidebar-visible: yes / no
+Execution carrier: primary task / spawn_agent / visible task
+Ownership: primary task / independent delivery task
+Depends on: none / ...
+Initial state: ready / blocked / pending
+Selection reason: whether the full trace is safely disposable and which state must persist
+Completion evidence: ...
+```
+
 ## Project-level AGENTS.md
 
 ```markdown
@@ -55,10 +69,14 @@ Read and copy only the template required for the current task. Remove irrelevant
 - Report every unverified item explicitly.
 ```
 
-## Subagent scouting brief
+## Level 1 subagent brief
 
 ```text
-Inspect [explicit directory, module, or source scope] read-only.
+Complete a temporary subtask within [explicit directory, module, or source scope].
+
+Mode: read-only scouting / verification / tightly bounded short-lived implementation
+May edit: none / [explicit files]
+The primary task retains final delivery ownership.
 
 Exact question:
 [Write one independently answerable question only.]
@@ -69,7 +87,20 @@ Return:
 3. Risks directly relevant to the conclusion;
 4. Unconfirmed items.
 
-Do not modify files, expand into adjacent questions, or return large raw logs.
+Do not expand into adjacent questions, modify unauthorized files, or return large raw logs.
+If the work needs cross-turn state, direct user intervention, independent ownership, formal handoff, or long-term recovery, stop and return current findings, generated artifacts, promotion reason, and recommended next action.
+```
+
+## Level 2 visibility checkpoint
+
+```text
+Target task: ...
+Creation result: READY / PENDING / FAILED
+thread ID: ...
+client ID, if any: ...
+Task-list check: title / project / environment / status
+Content spot-check: PASS / FAIL / not readable yet
+Decision: START / WAIT / STOP
 ```
 
 ## Visible implementation task brief

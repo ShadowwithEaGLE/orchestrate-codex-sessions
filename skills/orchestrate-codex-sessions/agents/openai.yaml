@@ -1,4 +1,4 @@
 interface:
   display_name: "Codex 多 Session 总管"
-  short_description: "按第一性原理编排主任务、subagent、可见任务与质量闸门"
-  default_prompt: "Use $orchestrate-codex-sessions 按第一性原理选择最小充分工作单元，并用明确所有权、质量闸门和证据完成当前任务。"
+  short_description: "按状态寿命和交付所有权路由主任务、临时代理与可见任务"
+  default_prompt: "Use $orchestrate-codex-sessions 按可丢弃性、状态寿命和交付所有权选择 Level 0/1/2；若本轮要求实施，允许创建判定所需的用户可见任务，并用质量闸门和证据完成交付。"

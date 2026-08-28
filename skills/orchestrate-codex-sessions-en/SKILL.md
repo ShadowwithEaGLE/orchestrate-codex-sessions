@@ -1,11 +1,13 @@
 ---
 name: orchestrate-codex-sessions-en
-description: "Orchestrate implementation, orchestration complete: coordinate Codex primary tasks, in-thread subagents, visible independent tasks, AGENTS.md contracts, Core/UI/Package/QA stages, Repair loops, and evidence gates from first principles. Use when the user says ‘orchestrate implementation’ or ‘orchestration complete’, or requests multi-session or multi-agent work, parallel subagent scouting, project orchestration, responsibility splitting, long-running handoffs, independent QA, or recoverable development workflows. Do not trigger implicitly for small single-file edits, one-shot answers, or work with no splitting benefit unless the user explicitly invokes this Skill."
+description: "Orchestrate implementation, orchestration complete: route work among the Codex primary task, disposable in-thread subagents, and sidebar-visible tasks by state lifetime, disposability, delivery ownership, and user addressability; manage AGENTS.md, Core/UI/Package/QA, Repair, and evidence gates. Use for multi-session or multi-agent work, subagent scouting, project orchestration, responsibility splitting, long-running handoffs, independent QA, or recoverable development workflows. Do not trigger implicitly for small single-file edits, one-shot answers, or work with no splitting benefit unless the user explicitly invokes this Skill."
 ---
 
 # Codex Multi-Session Orchestration
 
-Complete the task with the smallest sufficient work units. Use subagents for short-lived information questions and visible independent tasks for durable delivery ownership. Do not treat splitting work as quality by itself.
+Complete the task with the smallest sufficient work units. The primary test is whether the full execution trace can be safely discarded after returning a compressed result. Use an in-thread subagent when it can; use a sidebar-visible task when identity, state, handoff, or user intervention must persist. Do not treat splitting work as quality by itself.
+
+**Non-bypassable dispatch gate:** Before calling any delegation tool, including `spawn_agent`, visible-task creation, or fork, output the “Declare routing before dispatch” table. Do not delegate without the table; Level 1 internal agents are not exempt.
 
 ## Follow the authority order
 
@@ -21,27 +23,58 @@ If visible-task creation, subagents, wait, or worktree support is unavailable, s
 Answer these questions before splitting work:
 
 1. What must the user ultimately see, and what evidence proves completion?
-2. Which state must survive across turns, and which findings are disposable scouting results?
-3. Who owns changes, and which files or systems are off limits?
-4. Which work is truly independent, and which work depends on an interface or artifact?
-5. Does the user need to enter a work unit later to question, redirect, or resume it?
+2. Can the full execution trace be safely discarded after returning a compressed result?
+3. Which state must survive across turns, and which state is disposable?
+4. Who owns final delivery, and must the user enter this work unit directly?
+5. Does it require an independent project, branch, worktree, formal handoff, or failure recovery?
 
-Choose the lowest viable level:
-
-| Level | Structure | Use when |
+| Level | Structure | Essence |
 |---|---|---|
-| Level 0 | Primary task completes the work directly | Scope is concentrated, ownership is singular, and handoff adds little value |
-| Level 1 | Primary task plus in-thread subagents | Independent search, cross-file tracing, research, or verification can be compressed into evidence |
-| Level 2 | Visible primary task plus visible delivery tasks and necessary subagents | Work crosses modules or time, users need direct intervention, or stable ownership or independent QA is required |
+| Level 0 | Primary task completes the work directly | Work is concentrated and delegation adds little value |
+| Level 1 | Primary task plus in-thread subagents | Disposable short-lived delegation; the primary task retains sole final ownership |
+| Level 2 | Visible primary task plus visible delivery tasks and necessary Level 1 subagents | Delivery needs durable identity, state, independent ownership, or user addressability |
 
-Start at Level 0. Upgrade only when evidence shows a higher level is useful.
+Use Level 1 only when all conditions hold:
+
+- It can finish before the current primary task ends.
+- The primary task retains sole final delivery ownership and integrates and accepts the result.
+- The user does not need to enter, question, redirect, or resume the subtask directly.
+- The full trace can be compressed into conclusions, patches, `file:line`, or verification evidence and then safely discarded.
+- Failure permits safe redispatch without losing important business state.
+- It needs no independent project, branch, worktree, long-running environment, or formal upstream/downstream handoff.
+- It has no overlapping writes with another execution unit.
+
+Choose Level 2 when any condition holds:
+
+- State or execution history must survive across turns.
+- The user must enter the task to question, redirect, or resume it.
+- The work unit owns an independent deliverable.
+- A downstream task must formally consume its interface, artifact, manifest, or acceptance result.
+- It needs an independent project, branch, worktree, or long-lived environment.
+- QA, Repair, or external waiting needs a recoverable, auditable process.
+- The full history cannot be safely compressed and discarded.
+- The work unit still has independent value after the primary task ends.
+
+Complexity, duration, module count, file modification, model choice, and reasoning effort are signals, not sufficient decisions by themselves. When the user has explicitly chosen a work structure, that choice overrides the “start at Level 0” heuristic.
 
 ## Make authorization boundaries explicit
 
-- Create visible tasks or sessions only when the user explicitly requests creation, splitting, or multiple visible tasks. A request to “implement using multi-session orchestration” grants that authority.
+- Explicitly invoking `$orchestrate-codex-sessions-en` with implementation intent authorizes the orchestrator to choose Level 0, Level 1, or create the necessary Level 2 visible tasks within the current local scope without asking for each task separately.
+- Explicit invocation for planning, comparison, review, or recommendation remains read-only and does not authorize task creation or project changes.
+- Implicit Skill activation does not expand authority: Level 0/1 may proceed; when Level 2 is needed, list the proposed visible tasks and obtain one confirmation. Do not ask again when the user has already requested multi-session, independent, or sidebar-visible tasks.
 - When the user asks only for a plan, comparison, or recommendation, stop at read-only analysis and an orchestration proposal. Do not create visible tasks or modify the project.
 - Once the user explicitly authorizes implementation, continue within the established local scope without repeatedly asking for the same permission.
 - External writes, publishing, pushing, permission changes, destructive actions, and material scope expansion still require separate authorization.
+
+## Declare routing before dispatch
+
+Before the first delegation, output this table with one row per work unit. Do not replace it with prose or omit columns:
+
+| Work unit | Level | Sidebar-visible | Execution carrier | Ownership | Depends on | Initial state | Selection reason | Completion evidence |
+|---|---|---|---|---|---|---|---|---|
+| ... | 0 / 1 / 2 | yes / no | primary task / `spawn_agent` / visible task | primary / independent delivery | none / ... | ready / blocked / pending | ... | ... |
+
+Distinguish internal disposable subagents from user-visible tasks, and distinguish “create now” from “run only after dependencies pass.” Level 1 requires no sidebar task. Do not claim Level 2 orchestration exists until its visibility gate passes.
 
 ## Execute the workflow
 
@@ -60,6 +93,27 @@ Start at Level 0. Upgrade only when evidence shows a higher level is useful.
 - Parallelize only independent read-only scouting when current rules allow it.
 - A visible task is not file isolation. Serialize overlapping writes in a shared checkout. Parallel writes require non-overlapping ownership or separate worktrees.
 
+### 2.1 Treat dependencies and handoffs as hard gates
+
+- Declare `Depends on`, `Produces`, `Consumes`, `Handoff gate`, and `On success` for every task. Do not dispatch artifact-dependent tasks in parallel without these fields.
+- A downstream visible task may be created early but must remain `blocked` until its dependency passes. Its brief may describe only the waiting condition; it must not implement, guess interfaces, or terminate with a superficial answer.
+- Upstream completion does not authorize downstream start. The orchestrator must verify actual artifacts, test results, and unverified items, then send a structured handoff package and trigger the downstream task.
+- Minimum handoff package:
+
+```yaml
+status: ready_for_handoff
+produced: [artifact paths]
+manifest: path or null
+verification: [actual commands and results]
+failed_or_unverified: [items]
+next_task: canonical task name
+next_action: exact consumption step
+```
+
+- The downstream task must ACK that consumed files exist, the manifest is readable, and interface or data versions match. Only then may it move to `running`; otherwise keep it blocked and create the smallest Repair.
+- For asset pipelines, the manifest must map `source -> consumer` and include format checks such as alpha, dimensions, license, or checksum. Consumer UI must use manifest targets instead of guessing filenames or retaining stale assets.
+- Monitor accepted handoff packages, not prose claiming completion. This applies to UI → QA, Core → UI, generated assets → integration, and equivalent pipelines.
+
 ### 3. Decide whether to create `AGENTS.md`
 
 - Do not create `AGENTS.md` for Level 0 or a one-off read-only subagent merely for formality.
@@ -67,25 +121,34 @@ Start at Level 0. Upgrade only when evidence shows a higher level is useful.
 - Preserve existing user rules and add only the minimum project contract required.
 - Read [templates.md](references/templates.md) when a template is needed.
 
-### 4. Dispatch subagents
+### 4. Dispatch Level 1 subagents
 
-- Dispatch only concrete, independent, well-bounded scouting or verification questions.
-- Keep subagents read-only by default. Do not give them code ownership or final design authority unless the user or applicable rules explicitly allow it.
-- Make every task brief self-contained with search scope, exact question, and output format. Require `file:line`, symbol names, essential excerpts, or source links.
-- Dispatch independent questions in parallel only when current rules allow it, then follow the tool's required wait behavior.
-- Treat subagent conclusions as compressed leads. Spot-check cited locations without rereading the entire delegated scope.
-- Promote work to a visible task when it requires multiple user decisions, durable modification, or independent acceptance.
+- Use `spawn_agent` for internal disposable work that satisfies every Level 1 condition. Never use it to impersonate a Level 2 user-visible task.
+- Before each `spawn_agent` call, its routing row must explicitly say `Level 1`, `Sidebar-visible: no`, and `Execution carrier: spawn_agent`.
+- Dispatch only concrete, independent, well-bounded scouting, verification, or short-lived implementation. Keep subagents read-only by default; when the user and applicable rules allow it, they may make tightly bounded changes, but the primary task must retain final ownership, integrate the change, and verify the result.
+- Make every brief self-contained with search scope, exact question, allowed edit scope, and output format. Require `file:line`, symbol names, essential excerpts, patches, or source links.
+- Parallelize independent questions only when current rules allow it. Never modify overlapping files concurrently. Follow the tool's required wait behavior.
+- Treat a subagent result as a lossy compressed deliverable. Spot-check cited locations without rereading the entire delegated scope.
+- Before the primary task responds finally, wait for and accept every Level 1 result. Do not leave a disposable subagent with future responsibility.
+- When Level 1 discovers that work needs cross-turn state, direct user intervention, independent ownership, formal handoff, or long-term recovery, it must stop implementation and return current findings, artifacts, promotion reason, and next action. The primary task creates Level 2 when authorized; the subagent must not silently become a long-lived branch.
+- A Level 2 visible task may still use Level 1 subagents that meet these rules.
 
 ### 5. Dispatch visible delivery tasks
 
 - Write self-contained task briefs. Do not assume a new task inherits all primary-task history.
 - Include the project path, upstream state, ownership, prohibited scope, Acceptance, verification commands, and required completion report.
+- Resolve only the real project, host, environment, branch, and model values actually needed. When using a project, query its real identity and Git properties. Never invent project IDs, thread IDs, host IDs, models, branches, or worktree state. Do not perform irrelevant project lookup for projectless or fork flows.
+- Use tools that create or fork user-visible tasks. If creation fails or the capability is unavailable, stop and explain. Do not downgrade to `spawn_agent` without user approval.
+- At the first Level 2 checkpoint, use the task list to confirm every target really exists and verify thread ID, title, project, environment, and status. Report `pending` when only a client ID exists or setup is queued; do not claim readiness. Read a task when possible to spot-check its brief.
 - In full orchestrator mode, keep the primary task focused on management, decisions, and acceptance. Do not concurrently edit business code already owned by a delegated task.
 - After each implementation task completes, verify scope, interfaces, check results, and downstream usability before starting dependent work.
 
 ### 6. Monitor and enforce gates
 
 - Prefer wait or snapshot capabilities for visible tasks. Avoid noisy high-frequency polling.
+- Use an adaptive wait cadence: wait 2 minutes after initial dispatch to catch path, permission, compile, or launch blockers early; after stable implementation begins, default to a 10-minute `wait_threads` call. Completion, input requests, or state changes should wake it early.
+- Only after 10 minutes without change, read a compressed snapshot and check for tool stalls, input waits, error loops, or unmet handoff gates. After confirmed progress with no blocker, wait another 10 minutes instead of returning to fixed 5-minute polling.
+- Short commands, first launch, and tests immediately after a repair may use 1–2 minute waits as exceptions, not as the default for long implementation.
 - Report only meaningful milestones, decisions, blockers, gate results, and repair closure.
 - A task's self-declared completion is not acceptance. Check actual changes, command output, artifacts, and unverified items.
 - Preserve raw environment errors. Never use shims, `0 tests`, permission bypasses, or prose inference to manufacture a green result.

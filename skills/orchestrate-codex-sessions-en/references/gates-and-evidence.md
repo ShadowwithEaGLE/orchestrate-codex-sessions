@@ -15,11 +15,13 @@
 | Small fix in a known file | Level 0 | The primary task must read the exact code; handoff adds no value |
 | Trace three independent call paths across a large repository | Level 1 | Scouting can run in parallel and compress results into `file:line` evidence |
 | Build a compact static prototype plus investigate current state and acceptance | Level 1 | Subagents scout while the primary task retains sole implementation ownership |
+| Two non-overlapping small patches can finish in this turn | Level 1 | Traces are disposable; the primary task integrates, tests, and retains final ownership |
+| The user must enter the task later and keep redirecting it | Level 2 | Durable identity, history, and user addressability are required |
 | Core, UI, packaging, and QA have explicit dependencies | Level 2, serial | Durable ownership and stage gates are required |
 | Two modules can be edited independently in separate worktrees | Level 2, parallel | Delivery ownership and filesystems are isolated |
 | Two tasks share a checkout and modify the same file | Serial | Visible tasks do not provide file isolation |
 
-Do not split work unless you can identify the risk, context load, or elapsed time the split reduces.
+Do not split work unless you can identify the risk, context load, or elapsed time the split reduces. Level 1 must also prove that the full trace is safely disposable; Level 2 must prove that durable identity or state has independent value.
 
 ## Stage gates
 
@@ -50,6 +52,8 @@ Do not split work unless you can identify the risk, context load, or elapsed tim
 
 | Dimension | Minimum evidence | What cannot replace it |
 |---|---|---|
+| Level 1 routing | Every Level 1 condition holds, the result returned, and the primary task accepted it | “The task is small” |
+| Level 2 visibility | Real thread ID, title, project, environment, and status from the task list | A successful creation call or internal agent ID |
 | Scope | Actual changed files compared with ownership | A task claiming “I changed only these files” |
 | Logic | Fixture, self-check, or regression-check output | Code review alone |
 | Build | Actual Debug or Release command and exit result | Code that appears syntactically correct |
@@ -87,6 +91,9 @@ An environment blocker must include:
 
 - **Narrowing the request:** A screenshot requires category detail, but delivery shows only a total. Give every visible element its own Acceptance criterion.
 - **Orchestrator edits delegated code:** The primary task and implementation task modify the same scope. Preserve single ownership.
+- **Internal agent impersonates a visible task:** An internal `spawn_agent` ID is treated as a thread ID. Level 2 must pass the task-list visibility gate.
+- **Over-promotion:** A disposable same-turn task gets a sidebar session. Keep it Level 1 when every Level 1 condition holds.
+- **Implicit activation expands authority:** Automatic Skill matching immediately creates visible tasks. Obtain one Level 2 creation confirmation first.
 - **A subagent becomes a long-lived branch:** Work needs repeated user decisions but remains internal scouting. Promote it to a visible task.
 - **Visible tasks are mistaken for isolation:** Tasks write concurrently in a shared checkout. Serialize or use separate worktrees.
 - **QA fixes opportunistically:** Discovery, repair, and verification become one step. Create a minimal Repair task, then return to original QA.

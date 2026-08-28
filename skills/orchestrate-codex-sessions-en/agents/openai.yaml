@@ -1,4 +1,4 @@
 interface:
   display_name: "Codex Multi-Session Orchestrator"
-  short_description: "Orchestrate Codex tasks, agents, QA, and evidence gates"
-  default_prompt: "Use $orchestrate-codex-sessions-en to choose the smallest sufficient work units and complete this task with explicit ownership, quality gates, and evidence."
+  short_description: "Route durable tasks and disposable subagents by state lifetime"
+  default_prompt: "Use $orchestrate-codex-sessions-en to choose Level 0/1/2 by disposability, state lifetime, and delivery ownership; when this turn requests implementation, create the user-visible tasks the routing requires and complete delivery with quality gates and evidence."

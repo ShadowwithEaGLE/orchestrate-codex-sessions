@@ -2,7 +2,7 @@
 
 [English](README.en.md)
 
-`orchestrate-codex-sessions` 是一个 Codex Skill。它不默认追求更多 Agent，而是从第一性原理选择最小充分工作单元：主任务直接完成、会话内 subagent 侦察，或可见独立任务承担长期交付。
+`orchestrate-codex-sessions` 是一个 Codex Skill。它不默认追求更多 Agent，而是判断完整执行轨迹能否安全丢弃：能丢弃时使用会话内 subagent 隔离临时上下文；需要持久身份、状态、交接或用户介入时创建侧边栏可见任务。
 
 核心目标是让复杂开发具备明确所有权、依赖顺序、独立 QA、最小 Repair 和可核验的完成证据。
 
@@ -20,17 +20,17 @@
 | 级别 | 结构 | 适用场景 |
 |---|---|---|
 | Level 0 | 主任务直接完成 | 已知范围、小改动、单一责任主体 |
-| Level 1 | 主任务 + 会话内 subagent | 独立搜索、跨文件定位、调研或交叉验证 |
-| Level 2 | 可见主任务 + 可见交付任务 + 必要 subagent | 跨模块、长周期、稳定所有权、用户介入或独立 QA |
+| Level 1 | 主任务 + 会话内 subagent | 可在本轮完成，过程可丢弃，主任务保持唯一最终所有权 |
+| Level 2 | 可见主任务 + 可见交付任务 + 必要 subagent | 需要持久身份、独立所有权、正式交接、恢复或用户直接进入 |
 
-默认从 Level 0 开始。只有拆分能明确减少风险、上下文或等待时间时才升级。
+Level 1 可以做只读侦察、验证或边界明确的短期实施；它不是长期责任主体。Level 2 解决持久状态和用户可寻址性，但不自动提供文件隔离。
 
 ```mermaid
 flowchart LR
     A["确认目标、边界与证据"] --> B{"最低可行级别"}
     B -->|集中工作| C["Level 0 主任务"]
-    B -->|独立侦察| D["Level 1 subagent"]
-    B -->|长期交付| E["Level 2 可见任务"]
+    B -->|轨迹可丢弃| D["Level 1 subagent"]
+    B -->|状态需保留| E["Level 2 可见任务"]
     E --> F["Core → UI → Package/QA"]
     F --> G["独立 QA"]
     G -->|缺陷| H["最小 Repair"]
@@ -85,6 +85,8 @@ $orchestrate-codex-sessions 总管实施：拆分 Core、UI、Package 和独立 
 
 常见隐式触发词：`总管实施`、`编排完成`、`多 Session`、`项目总管`、`独立 QA`。
 
+显式调用本 Skill 并要求实施，表示授权它按判定结果使用 Level 0/1 或创建必要的 Level 2 可见任务。显式调用但只要求计划、比较或审查时仍保持只读。Skill 仅被隐式触发时不会自动扩大授权：若需要 Level 2，会先列出拟创建任务并取得一次确认。
+
 英文版显式调用：
 
 ```text
@@ -93,7 +95,11 @@ $orchestrate-codex-sessions-en Orchestrate implementation across Core, UI, Packa
 
 ## 执行边界
 
-- 可见独立任务只在用户明确授权时创建。
+- Level 1 必须满足：本轮完成、轨迹可丢弃、无需用户直接进入、无需独立环境或正式交接，并由主任务整合验收。
+- Level 1 可使用 `spawn_agent`；不得用内部 agent 冒充已经判定为 Level 2 的可见任务。
+- Level 1 发现需要持久状态时必须停止并升级，不能静默演变成长任务。
+- Level 2 创建后必须通过任务列表核对 thread ID、标题、项目、环境和状态，未确认前不得声称编排已建立。
+- 可见任务创建失败时停止说明，未经同意不得降级成内部 subagent。
 - 计划、比较或建议请求保持只读，不擅自实施。
 - 外部写入、发布、推送、权限变更和破坏性操作仍需单独授权。
 - 缺少 task、subagent、wait 或 worktree 能力时，技能会说明边界并降级执行。
