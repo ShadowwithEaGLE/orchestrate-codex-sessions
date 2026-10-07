@@ -167,6 +167,20 @@ Requirements:
 Return changed files, exact change, verification result, and remaining limitations.
 ```
 
+## Compact monitoring state
+
+Keep one entry per work unit in working context; save it only when durable handoff requires it. These are bookkeeping fields, not tool arguments or invented runtime statuses. Omit unsupported optional fields.
+
+```text
+Work unit: real ID / carrier / host if applicable
+Depends on: unmet dependencies or none
+Cursor: last returned cursor, if supported
+Last progress: timestamp / tool activity or artifact evidence
+Blocker: none / evidence and required decision
+Delivery: execution active or ended / report missing or returned / acceptance pending, passed, or failed
+Next action: work / wait / diagnose / recover report / accept / hand off / release
+```
+
 ## Primary-task gate report
 
 ```text

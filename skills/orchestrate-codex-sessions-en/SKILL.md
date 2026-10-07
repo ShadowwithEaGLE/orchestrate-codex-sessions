@@ -145,12 +145,23 @@ next_action: exact consumption step
 
 ### 6. Monitor and enforce gates
 
-- Prefer wait or snapshot capabilities for visible tasks. Avoid noisy high-frequency polling.
-- Use an adaptive wait cadence: wait 2 minutes after initial dispatch to catch path, permission, compile, or launch blockers early; after stable implementation begins, default to a 10-minute `wait_threads` call. Completion, input requests, or state changes should wake it early.
-- Only after 10 minutes without change, read a compressed snapshot and check for tool stalls, input waits, error loops, or unmet handoff gates. After confirmed progress with no blocker, wait another 10 minutes instead of returning to fixed 5-minute polling.
-- Short commands, first launch, and tests immediately after a repair may use 1–2 minute waits as exceptions, not as the default for long implementation.
-- Report only meaningful milestones, decisions, blockers, gate results, and repair closure.
-- A task's self-declared completion is not acceptance. Check actual changes, command output, artifacts, and unverified items.
+- Before waiting, accept returned results, prepare verification, or resolve independent decisions without duplicating delegated work or crossing write ownership. Wait when the next useful step depends on unfinished work.
+- Track each work unit's real ID and carrier, dependencies, cursor when supported, latest progress evidence and time, blocker, delivery state, and next action. Use the compact state template in [templates.md](references/templates.md); keep it in working context unless durable handoff needs a saved record.
+- Use the carrier's actual wait/snapshot tool; do not pass internal agent IDs to visible-thread tools. For visible tasks, batch active targets in one `wait_threads` call within the current limit (currently up to 8), preserving each target's host and returned cursor as `afterCursor`. For more targets, rotate bounded batches so one group cannot starve the others. Use `timeoutMs: 0` only for a needed immediate snapshot, not a busy loop.
+- Separate a single wait's timeout from the interval for deeper diagnosis. Respect current tool and host limits; where a 60-second responsiveness limit applies, keep each blocking wait within it. Do not hard-code a 10-minute blocking call. Check startup blockers early and space deeper reads farther apart after demonstrated progress.
+- Rely only on documented wake conditions. Current `wait_threads` wakes on completion, attention needed, or new user input; commentary alone does not wake it. Retain returned cursors and process per-target errors even when another target completes.
+
+| Observation | Next action |
+|---|---|
+| A task returns a result | Inspect its report and evidence immediately; after acceptance, release only the downstream work whose dependencies pass. Do not wait for unrelated tasks. |
+| Timeout with new progress | Record the evidence and cursor, then continue useful work or bounded waiting. Timeout is not task failure. |
+| No new message, no confirmed blocker | Compare the expected operation with the latest tool activity and artifacts when needed. Silence or elapsed time alone does not prove a stall; do not repeatedly reread full history. |
+| Input request, error loop, tool failure, or unmet dependency | Diagnose the specific blocker promptly within authorization. Leave user decisions to the user. Before retrying or reassigning, inspect existing artifacts and confirm the previous writer has stopped. |
+| Execution ended without the required report | Record execution as ended and the report as missing; inspect artifacts and recover the report through the same task when authorized. Do not accept or restart the work merely because execution ended. |
+
+- Distinguish execution ended, report returned, and primary-task acceptance. A self-declared completion is not acceptance: check actual changes, command output, artifacts, and unverified items.
+- Remove ended executions from the active wait set while retaining any missing-report or acceptance action. After acceptance, release disposable Level 1 agents using the available lifecycle tool when no continuation is needed. Preserve visible Level 2 tasks; acceptance alone does not authorize archiving or deletion. Reuse the same work unit for an authorized direct continuation and re-add it only when running again.
+- Report meaningful milestones, decisions, blockers, gate results, and repair closure; avoid repeating unchanged snapshots. Meet host communication requirements without inventing progress.
 - Preserve raw environment errors. Never use shims, `0 tests`, permission bypasses, or prose inference to manufacture a green result.
 - Read [gates-and-evidence.md](references/gates-and-evidence.md) when full gates are required.
 
