@@ -1,6 +1,6 @@
 ---
 name: orchestrate-codex-sessions-en
-description: "Orchestrate implementation, orchestration complete: route work among the Codex primary task, disposable in-thread subagents, and sidebar-visible tasks by state lifetime, disposability, delivery ownership, and user addressability; manage AGENTS.md, Core/UI/Package/QA, Repair, and evidence gates. Use for multi-session or multi-agent work, subagent scouting, project orchestration, responsibility splitting, long-running handoffs, independent QA, or recoverable development workflows. Do not trigger implicitly for small single-file edits, one-shot answers, or work with no splitting benefit unless the user explicitly invokes this Skill."
+description: "Use proactively for useful independent subtasks, implementation with independent review, cross-module or cross-source work, deliverable handoffs, or ongoing acceptance. Choose primary work, in-thread subagents, or visible tasks; manage model routing, dependencies, and verification. Skip simple questions and small edits with no delegation benefit unless explicitly invoked."
 ---
 
 # Codex Multi-Session Orchestration

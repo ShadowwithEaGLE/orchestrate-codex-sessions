@@ -1,6 +1,6 @@
 ---
 name: orchestrate-codex-sessions
-description: "总管实施、编排完成：按状态寿命、可丢弃性、交付所有权和用户可寻址性，在 Codex 主任务、会话内 subagent 与侧边栏可见任务之间路由，并管理 AGENTS.md、Core/UI/Package/QA、Repair 和证据闸门。用户说“总管实施”“编排完成”，或要求多 Session、多 Agent、subagent 侦察、项目总管、职责拆分、长期交接、独立 QA、可恢复开发流程时使用。普通单文件小改、一次性回答或没有拆分收益的任务不要隐式触发，除非用户显式调用本 Skill。"
+description: "用于有价值的独立子任务、实施与独立复核、跨模块或跨资料源工作、交付物交接及持续验收。主动选择主任务、会话内子代理或可见任务，管理模型路由、依赖与验证。简单问答及无委派收益的小改不触发，除非用户显式调用。"
 ---
 
 # Codex 多 Session 混合编排
