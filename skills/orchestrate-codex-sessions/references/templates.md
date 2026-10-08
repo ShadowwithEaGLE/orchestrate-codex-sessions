@@ -9,6 +9,10 @@
 级别：Level 0 / Level 1 / Level 2
 侧边栏可见：是 / 否
 执行载体：主任务 / spawn_agent / 可见任务
+创建工具：当前准确工具名 / 无
+模型：工具接受的 ID / 已核验的继承默认值 / 无
+推理档位：支持档位 / 已核验的继承默认值 / 无
+模型与档位依据：用户选择 / 当前工具 schema / OpenCodex 只读状态
 所有权：主任务 / 独立交付任务
 Depends on：无 / ...
 初始状态：ready / blocked / pending
@@ -96,6 +100,8 @@ Depends on：无 / ...
 ```text
 目标任务：...
 创建结果：READY / PENDING / FAILED
+请求模型 / 档位：...
+实际模型 / 档位：... / 未验证
 thread ID：...
 client ID（如有）：...
 任务列表核对：标题 / 项目 / 环境 / 状态

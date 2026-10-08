@@ -9,6 +9,10 @@ Work unit: ...
 Level: Level 0 / Level 1 / Level 2
 Sidebar-visible: yes / no
 Execution carrier: primary task / spawn_agent / visible task
+Creation tool: exact current tool name / none
+Model: tool-accepted ID / verified inherited default / none
+Reasoning effort: supported level / verified inherited default / none
+Model/effort evidence: user choice / current tool schema / OpenCodex read-only status
 Ownership: primary task / independent delivery task
 Depends on: none / ...
 Initial state: ready / blocked / pending
@@ -96,6 +100,8 @@ If the work needs cross-turn state, direct user intervention, independent owners
 ```text
 Target task: ...
 Creation result: READY / PENDING / FAILED
+Requested model / effort: ...
+Actual model / effort: ... / unverified
 thread ID: ...
 client ID, if any: ...
 Task-list check: title / project / environment / status

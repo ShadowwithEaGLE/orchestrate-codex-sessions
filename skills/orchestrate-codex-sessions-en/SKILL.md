@@ -76,6 +76,8 @@ Before the first delegation, output this table with one row per work unit. Do no
 
 Distinguish internal disposable subagents from user-visible tasks, and distinguish “create now” from “run only after dependencies pass.” Level 1 requires no sidebar task. Do not claim Level 2 orchestration exists until its visibility gate passes.
 
+For each delegated row, also declare the exact creation tool, tool-accepted model ID, reasoning effort, and the source of those choices. Complete the model gate below before dispatch; a display name or an OpenCodex setting alone is not creation evidence.
+
 ## Execute the workflow
 
 ### 1. Establish the real boundary
@@ -121,6 +123,15 @@ next_action: exact consumption step
 - Preserve existing user rules and add only the minimum project contract required.
 - Read [templates.md](references/templates.md) when a template is needed.
 
+### 3.1 Creation and model gate (Level 1 and Level 2)
+
+- Read the selected carrier's current tool schema before creation. Its advertised models, effort levels, argument names, and authorization rules are authoritative; `spawn_agent` and visible-task tools may expose different model sets. Do not copy a model ID from one carrier into another without checking.
+- For a requested non-GPT model, inspect the available OpenCodex routes and reasoning levels before falling back to GPT. When available, use OpenCodex's read-only model/injection/effort status or the local catalog and configuration. Distinguish configured availability from support in the active creation tool and successful execution; do not change global settings to satisfy a dispatch.
+- Resolve a user-facing alias to the exact ID accepted by the chosen carrier. Example: `agy/gemini3.8 flash high` may resolve to `model: "google-antigravity/gemini-3.8-flash"` with effort `"high"`; verify both against current evidence. An OpenCodex setting such as `openai/gpt-6-luna` must not be passed to `spawn_agent` when that tool advertises only `gpt-6-luna`. Do not generally strip provider prefixes: routed non-GPT IDs may require them.
+- Preserve the user's requested model and effort within current tool permissions. Distinguish user choices, OpenCodex preferred injection settings, parent-session inheritance, and catalog defaults. `xhigh` means Extra High, not `high`; an omitted effort must not be assumed to inherit an OpenCodex injection value. When an explicit override is permitted and needed, use the carrier's actual field (`reasoning_effort` for `spawn_agent`, `thinking` for visible-task tools when advertised) and the verified supported level.
+- A model missing from `spawn_agent` is unavailable on that carrier, not necessarily unavailable through OpenCodex. Check another authorized carrier that offers it, while preserving the work-unit, visibility, and ownership rules. Do not silently promote Level 1 to a visible task, create an unauthorized task, or substitute GPT/another effort; if no permitted route satisfies the request, report the specific boundary and obtain the necessary choice.
+- On creation failure, preserve the raw error and determine whether anything was created. Correct only the evidenced ID/argument mismatch, retaining the model intent and effort; retry once after rechecking the schema when non-creation is confirmed. For an unknown outcome, recover existing IDs/state before any retry. A repeated failure is a blocker, not permission to guess another model. After success, check the returned identity and available execution metadata; report requested versus actual model/effort, or mark actual values unverified.
+
 ### 4. Dispatch Level 1 subagents
 
 - Use `spawn_agent` for internal disposable work that satisfies every Level 1 condition. Never use it to impersonate a Level 2 user-visible task.
@@ -138,7 +149,7 @@ next_action: exact consumption step
 - Write self-contained task briefs. Do not assume a new task inherits all primary-task history.
 - Include the project path, upstream state, ownership, prohibited scope, Acceptance, verification commands, and required completion report.
 - Resolve only the real project, host, environment, branch, and model values actually needed. When using a project, query its real identity and Git properties. Never invent project IDs, thread IDs, host IDs, models, branches, or worktree state. Do not perform irrelevant project lookup for projectless or fork flows.
-- Use tools that create or fork user-visible tasks. If creation fails or the capability is unavailable, stop and explain. Do not downgrade to `spawn_agent` without user approval.
+- Use tools that create or fork user-visible tasks and apply the shared creation/model gate. If its permitted recovery fails or the capability is unavailable, stop and explain. Do not downgrade to `spawn_agent` without user approval.
 - At the first Level 2 checkpoint, use the task list to confirm every target really exists and verify thread ID, title, project, environment, and status. Report `pending` when only a client ID exists or setup is queued; do not claim readiness. Read a task when possible to spot-check its brief.
 - In full orchestrator mode, keep the primary task focused on management, decisions, and acceptance. Do not concurrently edit business code already owned by a delegated task.
 - After each implementation task completes, verify scope, interfaces, check results, and downstream usability before starting dependent work.
