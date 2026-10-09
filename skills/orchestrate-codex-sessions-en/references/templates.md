@@ -16,7 +16,7 @@ Model/effort evidence: user choice / current tool schema / OpenCodex read-only s
 Ownership: primary task / independent delivery task
 Depends on: none / ...
 Initial state: ready / blocked / pending
-Selection reason: whether the full trace is safely disposable and which state must persist
+Mode / edit scope: implementation / scouting / independent QA; exact writable files or none
 Completion evidence: ...
 ```
 
@@ -78,17 +78,20 @@ Completion evidence: ...
 ```text
 Complete a temporary subtask within [explicit directory, module, or source scope].
 
-Mode: read-only scouting / verification / tightly bounded short-lived implementation
-May edit: none / [explicit files]
+Mode: bounded implementation / read-only scouting / independent QA
+May edit: [explicit files for implementation] / none for scouting or QA
+Inputs and prerequisites: [existing files or accepted upstream artifacts]
+Finite steps and acceptance checks: [required actions and runnable checks]
 The primary task retains final delivery ownership.
 
-Exact question:
-[Write one independently answerable question only.]
+Task and acceptance:
+[One bounded implementation outcome or independently answerable review question.]
+For implementation, make the assigned changes and run the checks; do not return advice only.
 
 Return:
 1. Conclusion;
 2. file:line, symbol name, essential excerpt, or source link;
-3. Risks directly relevant to the conclusion;
+3. Changed files and artifacts, actual check commands/results, and directly relevant risks;
 4. Unconfirmed items.
 
 Do not expand into adjacent questions, modify unauthorized files, or return large raw logs.

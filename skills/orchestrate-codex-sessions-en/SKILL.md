@@ -57,6 +57,13 @@ Choose Level 2 when any condition holds:
 
 Complexity, duration, module count, file modification, model choice, and reasoning effort are signals, not sufficient decisions by themselves. When the user has explicitly chosen a work structure, that choice overrides the “start at Level 0” heuristic.
 
+## Delegate execution within authorization
+
+- For an implementation request, dispatch useful separable implementation to workers; the primary task owns requirements, key decisions, integration, and final acceptance. A read-only review does not replace delegating suitable implementation. Small or tightly coupled steps may remain Level 0.
+- Assign the role explicitly. Implementation workers edit assigned files, run relevant checks, and return actual artifacts. Scouting and independent QA remain read-only. Plan-only requests stay read-only; delegation never expands authorization.
+- Split long workflows into finite stages with bounded inputs, edit scope, acceptance checks, and compressed handoffs. Reassess remaining execution after each accepted stage rather than personally completing every later step after a single review. Follow the user's model policy in applicable instructions.
+- Keep routine routing rationale in working state. Report required decisions, material blockers, meaningful milestones, and delivery under current host responsiveness requirements; execution must not rely on the user monitoring explanations.
+
 ## Make authorization boundaries explicit
 
 - Explicitly invoking `$orchestrate-codex-sessions-en` with implementation intent authorizes the orchestrator to choose Level 0, Level 1, or create the necessary Level 2 visible tasks within the current local scope without asking for each task separately.
@@ -70,7 +77,7 @@ Complexity, duration, module count, file modification, model choice, and reasoni
 
 Before the first delegation, output this table with one row per work unit. Do not replace it with prose or omit columns:
 
-| Work unit | Level | Sidebar-visible | Execution carrier | Ownership | Depends on | Initial state | Selection reason | Completion evidence |
+| Work unit | Level | Sidebar-visible | Execution carrier | Ownership | Depends on | Initial state | Mode / edit scope | Completion evidence |
 |---|---|---|---|---|---|---|---|---|
 | ... | 0 / 1 / 2 | yes / no | primary task / `spawn_agent` / visible task | primary / independent delivery | none / ... | ready / blocked / pending | ... | ... |
 
@@ -92,7 +99,7 @@ For each delegated row, also declare the exact creation tool, tool-accepted mode
 - Split by delivery interface and risk boundary, not by file count.
 - For every visible task, define `Owns`, `Must not edit`, prerequisites, deliverables, verification commands, and completion criteria.
 - Serialize interface dependencies such as Core → UI → Package/QA.
-- Parallelize only independent read-only scouting when current rules allow it.
+- Parallelize independent scouting or implementation when current rules permit it and write ownership is disjoint.
 - A visible task is not file isolation. Serialize overlapping writes in a shared checkout. Parallel writes require non-overlapping ownership or separate worktrees.
 
 ### 2.1 Treat dependencies and handoffs as hard gates
@@ -135,8 +142,9 @@ next_action: exact consumption step
 ### 4. Dispatch Level 1 subagents
 
 - Use `spawn_agent` for internal disposable work that satisfies every Level 1 condition. Never use it to impersonate a Level 2 user-visible task.
+- If the requested model is unavailable on the native subagent tool, an available, authorized bounded CLI worker may carry Level 1 under the same lifetime and ownership rules. Track its process/session ID, result path, exit status, and requested/actual model and effort. Use scoped write permissions for implementation and read-only permissions for QA; do not bypass sandbox or authorization limits. A CLI worker is not a sidebar-visible task.
 - Before each `spawn_agent` call, its routing row must explicitly say `Level 1`, `Sidebar-visible: no`, and `Execution carrier: spawn_agent`.
-- Dispatch only concrete, independent, well-bounded scouting, verification, or short-lived implementation. Keep subagents read-only by default; when the user and applicable rules allow it, they may make tightly bounded changes, but the primary task must retain final ownership, integrate the change, and verify the result.
+- Dispatch concrete, independent, well-bounded execution. For an authorized implementation request, assign explicit write scope and require actual changes, runnable checks, and artifacts; do not default it to advice or read-only review. Scouting and independent QA remain read-only. The primary task retains final ownership, integrates the result, and verifies it.
 - Make every brief self-contained with search scope, exact question, allowed edit scope, and output format. Require `file:line`, symbol names, essential excerpts, patches, or source links.
 - Parallelize independent questions only when current rules allow it. Never modify overlapping files concurrently. Follow the tool's required wait behavior.
 - Treat a subagent result as a lossy compressed deliverable. Spot-check cited locations without rereading the entire delegated scope.
