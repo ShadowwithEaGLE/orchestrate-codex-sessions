@@ -82,6 +82,9 @@ Mode: bounded implementation / read-only scouting / independent QA
 May edit: [explicit files for implementation] / none for scouting or QA
 Inputs and prerequisites: [existing files or accepted upstream artifacts]
 Finite steps and acceptance checks: [required actions and runnable checks]
+First input subset / checkpoint: [actual bounded inputs / first artifact]
+Next progress check / correction condition: [observable stage evidence / deviation]
+Host shell / allowed reads: [actual shell / explicit files; no unrelated worker logs]
 The primary task retains final delivery ownership.
 
 Task and acceptance:
@@ -186,6 +189,10 @@ Depends on: unmet dependencies or none
 Cursor: last returned cursor, if supported
 Last progress: timestamp / tool activity or artifact evidence
 Blocker: none / evidence and required decision
+Native gate: current acceptance / explicit rejection or absence / unknown outcome
+Stage: input subset / expected artifact / accepted partial outputs
+Correction: observed deviation / same-worker input or confirmed-stop redispatch / next result
+Fallback: confirmed failure type / applicable model eligibility / next authorized route
 Delivery: execution active or ended / report missing or returned / acceptance pending, passed, or failed
 Next action: work / wait / diagnose / recover report / accept / hand off / release
 ```
