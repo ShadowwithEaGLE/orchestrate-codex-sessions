@@ -179,6 +179,31 @@ Requirements:
 Return changed files, exact change, verification result, and remaining limitations.
 ```
 
+## Windows shell patterns
+
+Use these in PowerShell directly, without another `powershell -Command` wrapper. `input.json` is UTF-8 data, not executable code. A single-quoted here-string preserves embedded quotes and JavaScript template expressions. For larger code, save an authorized `.py`/`.js` file and pass its path to the interpreter. Bash `<<EOF` is not PowerShell syntax. Check `$LASTEXITCODE` and actual output; stdin allows read-only work without helper-file writes.
+
+```powershell
+@'
+import json
+from pathlib import Path
+for row in json.loads(Path("input.json").read_text(encoding="utf-8")):
+    print(f"{row['name']}:{row['records']}")
+'@ | python -
+if ($LASTEXITCODE -ne 0) { throw "Python execution failed" }
+```
+
+```powershell
+@'
+const fs = require('node:fs');
+const rows = JSON.parse(fs.readFileSync('input.json', 'utf8'));
+for (const row of rows) console.log(`${row.name}:${row.records}`);
+'@ | node -
+if ($LASTEXITCODE -ne 0) { throw "Node execution failed" }
+```
+
+Keep code ASCII when piping under shells with legacy encodings; read non-ASCII business labels from the UTF-8 data file. If the code itself needs non-ASCII literals, use a UTF-8 script file or explicitly configure the pipe encoding.
+
 ## Compact monitoring state
 
 Keep one entry per work unit in working context; save it only when durable handoff requires it. These are bookkeeping fields, not tool arguments or invented runtime statuses. Omit unsupported optional fields.
@@ -192,7 +217,7 @@ Blocker: none / evidence and required decision
 Native gate: current acceptance / explicit rejection or absence / unknown outcome
 Stage: input subset / expected artifact / accepted partial outputs
 Correction: observed deviation / same-worker input or confirmed-stop redispatch / next result
-Fallback: confirmed failure type / applicable model eligibility / next authorized route
+Fallback: first-model invocation evidence / partner evidence / final-model gate / next authorized route
 Delivery: execution active or ended / report missing or returned / acceptance pending, passed, or failed
 Next action: work / wait / diagnose / recover report / accept / hand off / release
 ```

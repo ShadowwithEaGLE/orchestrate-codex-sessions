@@ -179,6 +179,31 @@ client ID（如有）：...
 完成时返回修改文件、精确改动、验证结果和剩余限制。
 ```
 
+## Windows shell 写法
+
+在 PowerShell 中直接使用，不再套一层 `powershell -Command`。`input.json` 是 UTF-8 数据，不是可执行代码。单引号 here-string 保留代码内引号与 JavaScript 模板表达式；较长代码保存到获授权的 `.py`/`.js` 文件，再把文件路径交给解释器。Bash 的 `<<EOF` 不是 PowerShell 语法。核对 `$LASTEXITCODE` 与真实输出；只读范围可用 stdin 避免写辅助文件。
+
+```powershell
+@'
+import json
+from pathlib import Path
+for row in json.loads(Path("input.json").read_text(encoding="utf-8")):
+    print(f"{row['name']}:{row['records']}")
+'@ | python -
+if ($LASTEXITCODE -ne 0) { throw "Python execution failed" }
+```
+
+```powershell
+@'
+const fs = require('node:fs');
+const rows = JSON.parse(fs.readFileSync('input.json', 'utf8'));
+for (const row of rows) console.log(`${row.name}:${row.records}`);
+'@ | node -
+if ($LASTEXITCODE -ne 0) { throw "Node execution failed" }
+```
+
+旧编码 shell 中通过管道传代码时保持代码为 ASCII，从 UTF-8 数据文件读取中文业务名称。代码本身需中文常量时，使用 UTF-8 脚本文件或明确设置管道编码。
+
 ## 简短监听状态
 
 每个工作单元在工作上下文中保留一条，持久交接需要时才落盘。这些是跟踪字段，不是工具参数或虚构的运行时状态；不支持的可选字段可省略。
@@ -192,7 +217,7 @@ Depends on：尚未满足的依赖或无
 原生门：当前接受 / 明确拒绝或缺失 / 结果未知
 阶段：输入子集 / 预期产物 / 已验收部分
 纠偏：实际偏离 / 向原代理输入或确认停止后重派 / 下一结果
-回退：已确认失败类型 / 模型适用条件 / 下个获授权路由
+回退：首选模型调用证据 / 另一模型证据 / 最终保底门 / 下个获授权路由
 交付状态：执行中或已结束 / 报告缺失或已返回 / 验收待定、通过或失败
 下一动作：工作 / 等待 / 诊断 / 补收报告 / 验收 / 交接 / 释放
 ```
